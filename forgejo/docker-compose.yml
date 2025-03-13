@@ -1,0 +1,59 @@
+networks:
+  forgejo:
+    external: false
+  proxy:
+    external: true
+
+volumes:
+  forgejo:
+  postgres:
+
+services:
+  server:
+    image: codeberg.org/forgejo/forgejo:10
+    container_name: forgejo
+    environment:
+      - USER_UID=1000
+      - USER_GID=1000
+      - FORGEJO__database__DB_TYPE=postgres
+      - FORGEJO__database__HOST=db:5432
+      - FORGEJO__database__NAME=${POSTGRES_DB}
+      - FORGEJO__database__USER=${FORGEJO_USER}
+      - FORGEJO__database__PASSWD=${FORGEJO_PASSWORD}
+    restart: always
+    networks:
+      - forgejo
+      - proxy
+    volumes:
+      - forgejo:/data:Z
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
+    ports:
+   #  - "3000:3000"
+      - "2222:22"
+    depends_on:
+      - db
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=proxy"
+      - "traefik.http.routers.forgejo.entrypoints=web"
+      - "traefik.http.routers.forgejo.rule=Host(`${DOMAIN_NAME}`)"
+      - "traefik.http.middlewares.forgejo-https-redirect.redirectscheme.scheme=websecure"
+      - "traefik.http.routers.forgejo.middlewares=forgejo-https-redirect"
+      - "traefik.http.routers.forgejo-secure.entrypoints=websecure"
+      - "traefik.http.routers.forgejo-secure.rule=Host(`${DOMAIN_NAME}`)"
+#      - "traefik.http.routers.forgejo-secure.middlewares=user-auth@file"
+      - "traefik.http.routers.forgejo-secure.service=forgejo"
+      - "traefik.http.services.forgejo.loadbalancer.server.port=3000"
+      - "traefik.http.routers.forgejo-secure.tls=true"
+  db:
+    image: postgres:17
+    restart: always
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    networks:
+      - forgejo
+    volumes:
+      - postgres:/var/lib/postgresql/data:Z
