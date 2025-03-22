@@ -1,0 +1,15 @@
+zone "test.zz" {
+    type master;
+    file "/etc/bind/zones/db.test.zz";
+};
+
+zone "sub.test.zz" {
+    type master;
+    file "/etc/bind/zones/db.sub.test.zz";
+};
+
+options {
+    forwarders {
+        10.10.10.100;
+    };
+};

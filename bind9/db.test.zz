@@ -1,0 +1,40 @@
+$TTL 86400
+@   IN  SOA ns1.test.zz. admin.test.zz. (
+            2025032201 ; Serial
+            3600       ; Refresh
+            1800       ; Retry
+            604800     ; Expire
+            86400      ; Minimum TTL
+)
+
+    IN  NS  ns1.test.zz.
+    IN  NS  ns2.test.zz.
+
+ns1 IN  A   10.0.0.1
+ns2 IN  A   10.0.0.2
+
+; Clients
+client1  IN  A   10.0.0.10
+client2  IN  A   10.0.0.11
+client3  IN  A   10.0.0.12
+client4  IN  A   10.0.0.13
+client5  IN  A   10.0.0.14
+client6  IN  A   10.0.0.15
+client7  IN  A   10.0.0.16
+client8  IN  A   10.0.0.17
+client9  IN  A   10.0.0.18
+client10 IN  A   10.0.0.19
+
+; Mailserver
+@   IN  MX 10 mail1.test.zz.
+@   IN  MX 20 mail2.test.zz.
+mail1 IN  A   10.0.0.20
+mail2 IN  A   10.0.0.21
+
+; Subdomain Delegation
+sub IN  NS  ns1.sub.test.zz.
+sub IN  NS  ns2.sub.test.zz.
+
+ns1.sub IN  A   10.0.0.30
+ns2.sub IN  A   10.0.0.31
+

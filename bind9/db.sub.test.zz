@@ -1,0 +1,29 @@
+$TTL 86400
+@   IN  SOA ns1.sub.test.zz. admin.test.zz. (
+            2025032201 ; Serial
+            3600       ; Refresh
+            1800       ; Retry
+            604800     ; Expire
+            86400      ; Minimum TTL
+)
+
+    IN  NS  ns1.sub.test.zz.
+    IN  NS  ns2.sub.test.zz.
+
+ns1 IN  A   10.0.0.30
+ns2 IN  A   10.0.0.31
+
+; Clients
+client1  IN  A   10.0.1.10
+client2  IN  A   10.0.1.11
+client3  IN  A   10.0.1.12
+client4  IN  A   10.0.1.13
+client5  IN  A   10.0.1.14
+client6  IN  A   10.0.1.15
+client7  IN  A   10.0.1.16
+client8  IN  A   10.0.1.17
+client9  IN  A   10.0.1.18
+client10 IN  A   10.0.1.19
+
+; Wildcard Record für myapps
+*.myapps  IN  A   10.0.1.100
