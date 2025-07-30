@@ -1,0 +1,81 @@
+services:
+  traefik:
+    image: traefik:v3         #gibt mehr tags, hier holt er immer das aktuelle aus v3
+    container_name: traefik
+    restart: unless-stopped
+    command:
+      - --api.dashboard=true
+      - --providers.docker=true
+      - --providers.docker.exposedbydefault=false
+      - --entrypoints.web.address=:80
+    ports:
+      - 80:80
+      - 8080:8080 # Traefik Dashboard
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    networks:
+      - frontend
+
+  drupal:
+    image: drupal:11.2.2-apache
+    container_name: drupal
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: drupaldb
+      POSTGRES_USER: drupaluser
+      POSTGRES_PASSWORD: drupalpassword
+      PATH: /greeneye-tools:$PATH
+    volumes:
+      - cms_modules:/var/www/html/modules
+      - cms_profiles:/var/www/html/profiles
+      - cms_themes:/var/www/html/themes
+      - cms_sites:/var/www/html/sites
+      - tools:/greeneye-tools
+    depends_on:
+      - db
+    networks:
+      - frontend
+      - backend
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.drupal.rule=Host(`drupal.localhost`)"
+      - "traefik.http.routers.drupal.entrypoints=web"
+
+  adminer:
+    image: adminer
+    container_name: adminer
+    restart: unless-stopped
+    depends_on:
+      - db
+    networks:
+      - frontend
+      - backend
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.adminer.rule=Host(`adminer.localhost`)"
+      - "traefik.http.routers.adminer.entrypoints=web"
+
+  db:
+    image: postgres:16
+    container_name: postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: drupaldb
+      POSTGRES_USER: drupaluser
+      POSTGRES_PASSWORD: drupalpassword
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+    networks:
+      - backend
+
+volumes:
+  cms_modules:
+  cms_profiles:
+  cms_themes:
+  cms_sites:
+  tools:
+  pg_data:
+
+networks:
+  frontend:
+  backend:

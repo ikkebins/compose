@@ -1,0 +1,11 @@
+# Container-ID holen
+docker ps
+
+# Laufenden Container in ein Image speichern
+docker commit <CONTAINER_ID> mytempimage:latest
+
+# Flatten: image exportieren und als flaches Image importieren
+docker save mytempimage:latest | docker import - myflattenedimage:latest
+
+# Optional: Image exportieren
+docker save myflattenedimage:latest -o myflattenedimage.tar
